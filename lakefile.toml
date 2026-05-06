@@ -1,0 +1,10 @@
+name = "make_visual"
+version = "0.1.0"
+defaultTargets = ["make_visual"]
+
+[[lean_lib]]
+name = "Graph"
+
+[[lean_exe]]
+name = "make_visual"
+root = "Main"
