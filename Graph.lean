@@ -8,7 +8,7 @@ open Option
 
 
 structure DiGraph where
-  adjacency : HashMap String (HashSet String) := {}
+  adjacency : HashMap String (List String) := {}
   deriving Repr
 
 
@@ -29,7 +29,7 @@ def addEdges (graph : DiGraph) (target : String) (deps : Option (List String)) :
 
 def toString (g : DiGraph) : String :=
     let entries := g.adjacency.toList.map fun (target, deps) =>
-      s!"{target} -> [{", ".intercalate deps.toList}]"
+      s!"{target} -> [{", ".intercalate deps}]"
     "DiGraph {\n" ++ "\n".intercalate entries ++ "\n}"
 
 
@@ -41,14 +41,11 @@ def to_dot (g : DiGraph) : String :=
   create_nodes g.adjacency.toList [] ++
   "}" 
 where
-  create_nodes (adjacency : List (String × HashSet String)) (acc : List String) : String :=
+  create_nodes (adjacency : List (String × List String)) (acc : List String) : String :=
     match adjacency with
       | [] => String.intercalate "" acc
-      | (target, deps) :: tail => 
-        match deps.toList with
-          | deps => match deps with
-            | [] => create_node target none :: acc |> create_nodes tail
-            | deps => create_nodes tail (deps.map (fun dep => create_node target (some dep)) ++ acc)
+      | (target, []) :: tail => create_node target none :: acc |> create_nodes tail
+      | (target, deps) :: tail => create_nodes tail (deps.map (fun dep => create_node target (some dep)) ++ acc)
 
   @[always_inline]
   create_node (target : String) (dep : Option String) : String :=
@@ -91,7 +88,6 @@ where
 
 
 -- TODO: implement filter by name and ancesters & descendents
--- TODO: implement print to dot & json
 -- TODO: implement unit tests
 -- TODO: implement prove some stuff about the code maybe
 
