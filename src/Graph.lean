@@ -16,8 +16,12 @@ namespace DiGraph
 
 def addEdge (graph : DiGraph) (target : String) (dep : Option String) : DiGraph :=
   match dep with
-  | some dep => { adjacency := graph.adjacency.getD target {} |> (dep :: ·) |> graph.adjacency.insert target }
-  | none => { adjacency := graph.adjacency.getD target {} |> graph.adjacency.insert target }
+  | some dep => { 
+      adjacency := graph.adjacency.getD target {} |> (dep :: ·) |> graph.adjacency.insert target
+    }
+  | none => {
+      adjacency := graph.adjacency.getD target {} |> graph.adjacency.insert target 
+    }
 
 
 def addEdges (graph : DiGraph) (target : String) (deps : Option (List String)) : DiGraph :=
@@ -70,10 +74,7 @@ where
   findDependencies (targets : List String) (depsGraph : DiGraph) : DiGraph :=
     match targets with
       | [] => depsGraph
-      | node :: rest => match adjacency[node]? with
-        | none => findDependencies rest (depsGraph.addEdge node none)
-        | some deps => findDependencies (deps ++ targets) (depsGraph.addEdges node (some deps))
-    
+      | node :: deps => findDependencies (deps ++ targets) (depsGraph.addEdges node adjacency[node]?)
 
 partial def targetsOnly (graph : DiGraph) (node : String) : DiGraph :=
   graph.reverseEdges |>.dependenciesOnly node
@@ -95,30 +96,28 @@ def addDotHeader (dotNodes : String) (rankdir : String) : String := s!"digraph G
 
 
 def parseMakeP (db : String) : DiGraph :=
-  dbg_trace db.splitOn "\n\n" |>.dropWhile (fun s => !s.endsWith "# Files") |>.drop 1
-  parseDb dbEntries {}
+  parseRules rules {}
 where
-  dbEntries := db.splitOn "\n\n" |>.dropWhile (fun s => !s.endsWith "# Files") |>.drop 1
+  rules := db.splitOn "\n\n" |>.dropWhile (fun s => !s.endsWith "# Files") |>.drop 1
 
-  parseDb (entries : List String) (acc : DiGraph) : DiGraph :=
+  parseRules (entries : List String) (acc : DiGraph) : DiGraph :=
     match entries with
       | [] => acc
       | head :: tail => 
         if head.startsWith "#" then
-          parseDb tail acc
+          parseRules tail acc
         else
-          match (head.splitOn "\n").take 1 with
-            | [line] => match line.splitOn ":" with
-              | target :: deps :: [] => 
-                parseDeps deps |> acc.addEdges target |> parseDb tail
-              | _ => parseDb tail acc
-            | _ => parseDb tail acc
+          match head.splitOn "\n" |>.take 1 |>.getD 0 "" |>.splitOn ":" with
+            | ".PHONY" :: _ => parseRules tail acc
+            | target :: deps :: [] => parseDeps deps |> acc.addEdges target |> parseRules tail
+            | _ => parseRules tail acc
 
   @[always_inline]
   parseDeps (deps : String) : Option (List String) := 
     match deps with
     | "" => none
     | deps => some (deps.splitOn.dropWhile (fun (s : String) => s.length == 0))
+
 
 -- TODO: implement only show ancesters and/or descendents of name pattern
 -- TODO: implement coloring by name pattern
