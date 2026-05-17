@@ -17,3 +17,5 @@ digraph G {
 }
 
 ```
+
+![dot_graph](./res/dot_graph.png)
