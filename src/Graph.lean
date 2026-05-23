@@ -14,20 +14,20 @@ structure DiGraph where
 namespace DiGraph
 
 
-  def addTarget (graph : DiGraph) (target : String) (dep : Option String) : DiGraph :=
-    match dep with
+  def addNode (graph : DiGraph) (node : String) (dependency : Option String) : DiGraph :=
+    match dependency with
     | some dep => { 
-        adjacency := graph.adjacency.getD target {} |> (dep :: ·) |> graph.adjacency.insert target
+        adjacency := graph.adjacency.getD node {} |> (dep :: ·) |> graph.adjacency.insert node
       }
     | none => {
-        adjacency := graph.adjacency.getD target {} |> graph.adjacency.insert target 
+        adjacency := graph.adjacency.getD node {} |> graph.adjacency.insert node 
       }
 
 
-  def addTargets (graph : DiGraph) (target : String) (deps : Option (List String)) : DiGraph :=
-    match deps with
-      | some deps => deps.foldl (fun graph' dep => addTarget graph' target (some dep)) graph
-      | none => graph.addTarget target none
+  def addNodes (graph : DiGraph) (node : String) (descendents : Option (List String)) : DiGraph :=
+    match descendents with
+      | some descendents' => descendents'.foldl (fun graph' dep => addNode graph' node (some dep)) graph
+      | none => graph.addNode node none
 
 
   def reverseEdges (graph : DiGraph) : DiGraph :=
@@ -35,14 +35,14 @@ namespace DiGraph
   where
     reverse (adjacency : List (String × List String)) (acc : DiGraph) : DiGraph :=
       match adjacency with
-        | (target, []) :: rest => acc.addTarget target none |> reverse rest
-        | (target, deps) :: rest => deps.foldl (fun graph' dep => addTarget graph' dep (some target)) acc |> reverse rest
+        | (node, []) :: rest => acc.addNode node none |> reverse rest
+        | (node, descendents) :: rest => descendents.foldl (fun graph' dep => addNode graph' dep (some node)) acc |> reverse rest
         | [] => acc
 
 
   def toString (graph : DiGraph) : String :=
-      let entries := graph.adjacency.toList.mapTR fun (target, deps) =>
-      s!"{target} -> [{", ".intercalate deps}]"
+      let entries := graph.adjacency.toList.mapTR fun (node, descendents) =>
+      s!"{node} -> [{", ".intercalate descendents}]"
       "DiGraph {\n" ++ 
       "\n".intercalate entries ++ 
       "\n}"
@@ -54,31 +54,32 @@ namespace DiGraph
     createNodes (adjacency : List (String × List String)) (acc : List String) : String :=
       match adjacency with
         | [] => "\n".intercalate acc
-        | (target, []) :: tail => createNode target none :: acc |> createNodes tail
-        | (target, deps) :: tail => createNodes tail (deps.eraseDups.mapTR (fun dep => createNode target (some dep)) ++ acc)
+        | (node, []) :: tail => createNode node none :: acc |> createNodes tail
+        | (node, descendents) :: tail => createNodes tail (descendents.eraseDups.mapTR (fun dep => createNode node (some dep)) ++ acc)
 
     @[always_inline]
-    createNode (target : String) (dep : Option String) : String :=
+    createNode (node : String) (dep : Option String) : String :=
       match dep with
-       | none => s!"  \"{target}\""
-       | some dep => s!"  \"{target}\" -> \"{dep}\""
+       | none => s!"  \"{node}\""
+       | some dep => s!"  \"{node}\" -> \"{dep}\""
 
 
   /-- Will always termiante because a Makefile is always a DAG -/
   partial def getAllAncesters (node : String) (graph : DiGraph) : Option DiGraph :=
-    match adjacency[node]? with
-     | none => none
-     | some _ => findAllAncestors [node] {}
+    if adjacency.contains node then
+      none
+    else
+      findAllAncestors [node] {}
   where
     adjacency := graph.adjacency
 
-    findAllAncestors (targets : List String) (depsGraph : DiGraph) : DiGraph :=
-      match targets with
-        | [] => depsGraph
-        | target :: rest => findAllAncestors (rest ++ targets) (depsGraph.addTargets target adjacency[target]?)
+    findAllAncestors (queue : List String) (ancestors : DiGraph) : DiGraph :=
+      match queue with
+        | [] => ancestors
+        | current :: rest => ancestors.addNodes current adjacency[current]? |> findAllAncestors (rest ++ queue) 
 
-  partial def getAllDescendents (graph : DiGraph) (target : String) : Option DiGraph :=
-    graph.reverseEdges |>.getAllAncesters target
+  partial def getAllDescendents (nude : String) (graph : DiGraph) : Option DiGraph :=
+    graph.reverseEdges |>.getAllAncesters nude
 
 
 end DiGraph
@@ -110,7 +111,7 @@ where
         else
           match head.splitOn "\n" |>.getD 0 "" |>.splitOn ":" with
             | ".PHONY" :: _ => parseRules tail acc
-            | target :: deps :: [] => parseDeps deps |> acc.addTargets target |> parseRules tail
+            | target :: deps :: [] => parseDeps deps |> acc.addNodes target |> parseRules tail
             | _ => parseRules tail acc
 
   @[always_inline]
