@@ -65,8 +65,10 @@ namespace DiGraph
 
 
   /-- Will always termiante because a Makefile is always a DAG -/
-  partial def getAllAncesters (node : String) (graph : DiGraph) : DiGraph :=
-    findAllAncestors [node] {}
+  partial def getAllAncesters (node : String) (graph : DiGraph) : Option DiGraph :=
+    match adjacency[node]? with
+     | none => none
+     | some _ => findAllAncestors [node] {}
   where
     adjacency := graph.adjacency
 
@@ -75,7 +77,7 @@ namespace DiGraph
         | [] => depsGraph
         | target :: rest => findAllAncestors (rest ++ targets) (depsGraph.addTargets target adjacency[target]?)
 
-  partial def getAllDescendents (graph : DiGraph) (target : String) : DiGraph :=
+  partial def getAllDescendents (graph : DiGraph) (target : String) : Option DiGraph :=
     graph.reverseEdges |>.getAllAncesters target
 
 
