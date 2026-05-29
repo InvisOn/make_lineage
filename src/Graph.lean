@@ -7,8 +7,9 @@ open Option
 
 
 structure DiGraph where
+  empty ::
   adjacency : HashMap String (List String) := {}
-  deriving Repr
+  deriving Repr, BEq
 
 
 namespace DiGraph
@@ -64,46 +65,37 @@ namespace DiGraph
        | some dep => s!"  \"{node}\" -> \"{dep}\""
 
 
-  /-- Will always termiante because a Makefile is always a DAG -/
-  partial def getAllAncesters (node : String) (graph : DiGraph) : Option DiGraph :=
-    if adjacency.contains node then
-      none
-    else
-      findAllAncestors [node] {}
-  where
-    adjacency := graph.adjacency
-
-    findAllAncestors (queue : List String) (ancestors : DiGraph) : DiGraph :=
-      match queue with
-        | [] => ancestors
-        | current :: rest => ancestors.addNodes current adjacency[current]? |> findAllAncestors (rest ++ queue) 
-
-  partial def getAllDescendents (nude : String) (graph : DiGraph) : Option DiGraph :=
-    graph.reverseEdges |>.getAllAncesters nude
+-- TODO: use networkx as examples for how the implement isolate node
+-- https://networkx.org/documentation/stable/_modules/networkx/algorithms/traversal/depth_first_search.html
 
 
 end DiGraph
 
 
+
 instance : ToString DiGraph := ⟨DiGraph.toString⟩
 
 
-def addDotHeader (dotNodes : String) (rankdir : String) (dir : String): String := s!"digraph G \{
-  graph [rankdir={rankdir}]
+def addDotHeader (dotNodes : String) : String := s!"digraph G \{
+  graph [rankdir=RL]
   node [shape=box, style=solid, margin=\"0.3,0.1\"]
-  edge [color=\"#00000088\", dir={dir}, penwidth=1.2, minlen=1]
+  edge [color=\"#00000088\", dir=forward, penwidth=1.2, minlen=1]
 
 {dotNodes}
 }"
 
 
-def parseMakeP (db : String) : DiGraph :=
-  parseRules rules {}
+def parseMakeP (db : String) : Option DiGraph :=
+  let graph := parseRules rules {}
+  if graph == {} then
+    none
+  else
+    graph
 where
   rules := db.splitOn "\n\n" |>.dropWhile (fun s => !s.endsWith "# Files") |>.drop 1
 
-  parseRules (entries : List String) (acc : DiGraph) : DiGraph :=
-    match entries with
+  parseRules (rules : List String) (acc : DiGraph) : DiGraph :=
+    match rules with
       | [] => acc
       | head :: tail => 
         if head.startsWith "#" then

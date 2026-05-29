@@ -24,5 +24,4 @@ globs = ["Tests.+"]
 [[lean_exe]]
 name = "tests"
 srcDir = "tests"
-root = "Runner"
-
+root = "Test"
