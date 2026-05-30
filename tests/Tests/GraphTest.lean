@@ -30,3 +30,8 @@ import Std.Data.HashMap
 /-- info: some (Std.HashSet.ofList ["a", "b"]) -/
 #guard_msgs in
 #eval ({ adjacency := Std.HashMap.ofList [("a", ["b"]), ("b", [])]} : DiGraph).depthFirstSearch "a"
+
+
+/-- info: some (Std.HashSet.ofList ["d", "c", "a", "b"]) -/
+#guard_msgs in
+#eval ({ adjacency := Std.HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("c", ["d"])]} : DiGraph).depthFirstSearch "a"
