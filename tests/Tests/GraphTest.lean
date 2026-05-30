@@ -2,36 +2,56 @@ import Graph
 import Std.Data.HashMap
 
 
-/-- info: { adjacency := Std.HashMap.ofList [("a", [])] } -/
-#guard_msgs in
-#eval DiGraph.empty {} |>.addEdge "a" none
+def graph := ({ adjacency := Std.HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("c", ["d"])]} : DiGraph)
 
 
-/-- info: { adjacency := Std.HashMap.ofList [("a", ["b"])] } -/
-#guard_msgs in
-#eval DiGraph.empty {} |>.addEdge "a" (some "b") 
+namespace TestAddEdge
+
+  /-- info: { adjacency := Std.HashMap.ofList [("a", [])] } -/
+  #guard_msgs in
+  #eval DiGraph.empty {} |>.addEdge "a" none
 
 
-/-- info: { adjacency := Std.HashMap.ofList [("a", [])] } -/
-#guard_msgs in
-#eval DiGraph.empty {} |>.addEdges "a" none
+  /-- info: { adjacency := Std.HashMap.ofList [("c", ["d"]), ("a", ["b", "c", "e"]), ("b", ["c"])] } -/
+  #guard_msgs in
+  #eval graph.addEdge "a" (some "e") 
 
 
-/-- info: { adjacency := Std.HashMap.ofList [("a", ["b", "c", "d"]), ("b", [])] } -/
-#guard_msgs in
-#eval ({ adjacency := Std.HashMap.ofList [("a", ["b"]), ("b", [])]} : DiGraph) |>.addEdges "a" (some ["c", "d"]) 
+  /-- info: { adjacency := Std.HashMap.ofList [("e", []), ("c", ["d"]), ("a", ["b", "c"]), ("b", ["c"])] } -/
+  #guard_msgs in
+  #eval graph.addEdges "e" none
+
+end TestAddEdge
 
 
-/-- info: 5 -/
-#guard_msgs in
-#eval ({ adjacency := Std.HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("c", ["d"])]} : DiGraph).degree
+namespace TestaddEdges
+
+  /-- info: { adjacency := Std.HashMap.ofList [("c", ["d"]), ("a", ["b", "c", "e", "f"]), ("b", ["c"])] } -/
+  #guard_msgs in
+  #eval graph |>.addEdges "a" (some ["e", "f"]) 
+
+end TestaddEdges
 
 
-/-- info: some (Std.HashSet.ofList ["a", "b"]) -/
-#guard_msgs in
-#eval ({ adjacency := Std.HashMap.ofList [("a", ["b"]), ("b", [])]} : DiGraph).depthFirstSearch "a"
+namespace TestDegree
+
+  /-- info: 4 -/
+  #guard_msgs in
+  #eval graph.degree
+
+end TestDegree
 
 
-/-- info: some (Std.HashSet.ofList ["d", "c", "a", "b"]) -/
-#guard_msgs in
-#eval ({ adjacency := Std.HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("c", ["d"])]} : DiGraph).depthFirstSearch "a"
+namespace TestDepthFirstSearch
+
+  /-- info: some (Std.HashSet.ofList ["d", "c", "a", "b"]) -/
+  #guard_msgs in
+  #eval graph.depthFirstSearch "a"
+
+
+  /-- info: some (Std.HashSet.ofList ["d", "c", "b"]) -/
+  #guard_msgs in
+  #eval graph.depthFirstSearch "b"
+
+end TestDepthFirstSearch
+

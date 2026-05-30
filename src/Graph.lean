@@ -72,10 +72,10 @@ namespace DiGraph
       if !graph.adjacency.contains source then
         none
       else
-        -- Pass degree to avoid partial function
         dfs graph source {} graph.degree
     where
       dfs (graph : DiGraph) (node : String) (visited : HashSet String) (degree : Nat) : HashSet String :=
+        -- Use degree to make function total
         match degree with
          | 0 => visited.insert node
          | i + 1 => graph.adjacency.getD node [] |>.foldrTR (fun n acc => if !acc.contains n then dfs graph n acc i else acc) (visited.insert node)
@@ -83,25 +83,17 @@ namespace DiGraph
 
 -- TODO: dfs_predecessors https://networkx.org/documentation/stable/_modules/networkx/algorithms/traversal/depth_first_search.html#dfs_predecessors
   def findPredecessors (graph : DiGraph) (node : String) : Option (HashSet String) :=
-    if !graph.adjacency.contains node then
-      none
-    else
-      aux graph node {}
-    where
-      aux (graph : DiGraph) (node : String) (visited : HashSet String) : HashSet String := sorry
+      graph.reverseEdges.depthFirstSearch node
+
 
 
 -- TODO: dfs_successors https://networkx.org/documentation/stable/_modules/networkx/algorithms/traversal/depth_first_search.html#dfs_successors
   def findSuccessors (graph : DiGraph) (node : String) : Option (HashSet String) :=
-    if !graph.adjacency.contains node then
-      none
-    else
-      aux graph node {}
-    where
-      aux (graph : DiGraph) (node : String) (visited : HashSet String) : HashSet String := sorry
+    graph.depthFirstSearch node
 
 
 -- TODO: https://github.com/networkx/networkx/blob/96ad598cbe41baf6424dfa4bb860f93569c353a9/networkx/classes/graph.py#L1793
+-- TODO: dfs on source 
   def subGraph (graph : DiGraph) (nodesToKeep : HashSet String) : DiGraph := sorry
 
 
