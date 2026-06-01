@@ -64,6 +64,13 @@ def graph := ({ adjacency := Std.HashMap.ofList [("a", ["b", "c"]), ("b", ["c"])
 
 
 
-/-- info: some (Std.HashSet.ofList ["d", "c", "b"]) -/
+/-- info: some (Std.HashSet.ofList ["d", "c"]) -/
 #guard_msgs in
 #eval graph.findSuccessors "b"
+
+
+
+/-- info: some (Std.HashSet.ofList ["a", "c", "b"]) -/
+#guard_msgs in
+#eval graph.findPredecessors "d"
+

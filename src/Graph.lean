@@ -81,15 +81,12 @@ namespace DiGraph
          | i + 1 => graph.adjacency.getD node [] |>.foldrTR (fun n acc => if !acc.contains n then dfs graph n acc i else acc) (visited.insert node)
 
 
--- TODO: dfs_predecessors https://networkx.org/documentation/stable/_modules/networkx/algorithms/traversal/depth_first_search.html#dfs_predecessors
-  def findPredecessors (graph : DiGraph) (node : String) : Option (HashSet String) :=
-      graph.reverseEdges.depthFirstSearch node
+  def findPredecessors (graph : DiGraph) (node : String) : Option (HashSet String) := do
+      graph.reverseEdges.depthFirstSearch node |>.map (·.erase node)
 
 
-
--- TODO: dfs_successors https://networkx.org/documentation/stable/_modules/networkx/algorithms/traversal/depth_first_search.html#dfs_successors
   def findSuccessors (graph : DiGraph) (node : String) : Option (HashSet String) :=
-    graph.depthFirstSearch node
+    graph.depthFirstSearch node |>.map (·.erase node)
 
 
   def lineageNode (graph : DiGraph) (node : String) : Option (HashSet String) :=
