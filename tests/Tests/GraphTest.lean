@@ -1,8 +1,10 @@
 import Graph
-import Std.Data.HashMap
+import Std
+
+open Std
 
 
-def graph := ({ adjacency := Std.HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("c", ["d"])]} : DiGraph)
+def graph := ({ adjacency := HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("c", ["d"])]} : DiGraph)
 
 
 
@@ -70,7 +72,11 @@ def graph := ({ adjacency := Std.HashMap.ofList [("a", ["b", "c"]), ("b", ["c"])
 
 
 
-/-- info: some (Std.HashSet.ofList ["a", "c", "b"]) -/
+/-- info: some (Std.HashSet.ofList ["a", "b"]) -/
 #guard_msgs in
-#eval graph.findPredecessors "d"
+#eval graph.findPredecessors "c"
 
+
+/-- info: { adjacency := Std.HashMap.ofList [("a", ["b"]), ("b", [])] } -/
+#guard_msgs in
+#eval graph.getSubGraph {"a", "b"}

@@ -89,7 +89,7 @@ namespace DiGraph
     graph.depthFirstSearch node |>.map (·.erase node)
 
 
-  def lineageNode (graph : DiGraph) (node : String) : Option (HashSet String) :=
+  def getLineageNode (graph : DiGraph) (node : String) : Option (HashSet String) :=
     if !graph.adjacency.contains node then
       none
     else
@@ -100,9 +100,14 @@ namespace DiGraph
         | some ancestors, some descendents => HashSet.insertMany {node} ancestors |>.insertMany descendents
 
 
--- TODO: https://github.com/networkx/networkx/blob/96ad598cbe41baf6424dfa4bb860f93569c353a9/networkx/classes/graph.py#L1793
--- TODO: dfs on source 
-  def subGraph (graph : DiGraph) (nodesToKeep : HashSet String) : DiGraph := sorry
+  def getSubGraph (graph : DiGraph) (nodesToKeep : HashSet String) : DiGraph :=
+    { adjacency := graph.adjacency.filterMap aux }
+  where
+    aux (key : String) (value : List String) : Option (List String) :=
+      if !nodesToKeep.contains key then
+        none
+      else
+        value.filter (fun n => nodesToKeep.contains n)
 
 
 end DiGraph
