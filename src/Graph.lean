@@ -72,13 +72,13 @@ namespace DiGraph
       if !graph.adjacency.contains source then
         none
       else
-        dfs graph source {} graph.degree
+        search graph source {} graph.degree
     where
-      dfs (graph : DiGraph) (node : String) (visited : HashSet String) (degree : Nat) : HashSet String :=
-        -- Use degree to make function total
+      search (graph : DiGraph) (node : String) (visited : HashSet String) (degree : Nat) : HashSet String :=
+        -- Use the degree of the graph to make function total
         match degree with
          | 0 => visited.insert node
-         | i + 1 => graph.adjacency.getD node [] |>.foldrTR (fun n acc => if !acc.contains n then dfs graph n acc i else acc) (visited.insert node)
+         | i + 1 => graph.adjacency.getD node [] |>.foldrTR (fun n acc => if !acc.contains n then search graph n acc i else acc) (visited.insert node)
 
 
   def findPredecessors (graph : DiGraph) (node : String) : Option (HashSet String) := do
@@ -101,9 +101,9 @@ namespace DiGraph
 
 
   def getSubGraph (graph : DiGraph) (nodesToKeep : HashSet String) : DiGraph :=
-    { adjacency := graph.adjacency.filterMap aux }
+    { adjacency := graph.adjacency.filterMap predicate }
   where
-    aux (key : String) (value : List String) : Option (List String) :=
+    predicate (key : String) (value : List String) : Option (List String) :=
       if !nodesToKeep.contains key then
         none
       else
