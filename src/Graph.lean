@@ -48,9 +48,21 @@ namespace DiGraph
       "\n}"
 
 
-  def toDotNodes (graph : DiGraph) : String :=
-    createNodes graph.adjacency.toList []
+  def toDot (graph : DiGraph) (nodesToFill : HashSet String) : String :=
+    s!"digraph G \{
+  graph [rankdir=RL]
+  node [shape=box, style=solid, margin=\"0.3,0.1\"]
+  edge [color=\"#00000088\", dir=forward, penwidth=1.2, minlen=1]
+
+{filledNodes}
+
+{dotNodes}
+}"
   where
+    filledNodes := nodesToFill.toList.foldrTR (fun s acc => s!"\"{s}\" [style = \"solid,filled\"]\n" ++ acc) ""
+
+    dotNodes := createNodes graph.adjacency.toList []
+
     createNodes (adjacency : List (String × List String)) (acc : List String) : String :=
       match adjacency with
         | [] => "\n".intercalate acc
@@ -123,15 +135,6 @@ namespace DiGraph
 end DiGraph
 
 instance : ToString DiGraph := ⟨DiGraph.toString⟩
-
-
-def addDotHeader (dotNodes : String) : String := s!"digraph G \{
-  graph [rankdir=RL]
-  node [shape=box, style=solid, margin=\"0.3,0.1\"]
-  edge [color=\"#00000088\", dir=forward, penwidth=1.2, minlen=1]
-
-{dotNodes}
-}"
 
 
 def parseMakeP (db : String) : DiGraph :=
