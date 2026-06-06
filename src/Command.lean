@@ -27,7 +27,7 @@ def runCommands (p : Parsed) : IO UInt32 := do
         IO.eprintln s!"Cannot prune the lineage {node.value} because it was not found in the Makefile DAG"
         return 1
       | some lineage => 
-        graph := graph.pruneLineage lineage
+        graph := graph.pruneNodes lineage
 
   if let some node := p.flag? "highlight-lineage" then
     match graph.getLineageNode node.value with

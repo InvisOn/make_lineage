@@ -138,7 +138,7 @@ namespace DiGraph
         value.filter (nodesToKeep.contains ·)
 
 
-  def pruneLineage (graph : DiGraph) (nodesToPrune : HashSet String) : DiGraph :=
+  def pruneNodes (graph : DiGraph) (nodesToPrune : HashSet String) : DiGraph :=
     { adjacency := graph.adjacency.filterMap predicateMap }
   where
     predicateMap (key : String) (value : List String) : Option (List String) :=

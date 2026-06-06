@@ -51,6 +51,10 @@ def graph := ({ adjacency := HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("
 #eval graph.findSuccessors "b"
 
 
+/-- info: some (Std.HashSet.ofList ["d", "c", "a", "b"]) -/
+#guard_msgs in
+#eval graph.getLineageNode "b"
+
 
 /-- info: some (Std.HashSet.ofList ["a", "b"]) -/
 #guard_msgs in
@@ -64,5 +68,5 @@ def graph := ({ adjacency := HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("
 
 /-- info: { adjacency := Std.HashMap.ofList [("c", [])] } -/
 #guard_msgs in
-#eval graph.pruneLineage {"a", "b", "d"}
+#eval graph.pruneNodes {"a", "b", "d"}
 
