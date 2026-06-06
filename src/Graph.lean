@@ -16,8 +16,8 @@ namespace DiGraph
 
   def addRule (graph : DiGraph) (target : String) (prerequisites : Option (List String)) : DiGraph :=
     match prerequisites with
-      | some prerequisites' => prerequisites'.foldrTR (aux target) graph
-      | none => add graph target none
+    | some prerequisites' => prerequisites'.foldrTR (aux target) graph
+    | none => add graph target none
   where
     add (graph : DiGraph) (nodeA : String) (predecessor : Option String) : DiGraph :=
       match predecessor with
@@ -38,9 +38,9 @@ namespace DiGraph
   where
     reverse (adjacency : List (String × List String)) (acc : DiGraph) : DiGraph :=
       match adjacency with
-        | (node, []) :: rest => acc.addRule node none |> reverse rest
-        | (node, descendents) :: rest => descendents.foldrTR (aux node) acc |> reverse rest
-        | [] => acc
+      | (node, []) :: rest => acc.addRule node none |> reverse rest
+      | (node, descendents) :: rest => descendents.foldrTR (aux node) acc |> reverse rest
+      | [] => acc
 
     @[always_inline]
     aux (node : String) (descendent : String) (graph : DiGraph) : DiGraph :=
@@ -80,9 +80,9 @@ namespace DiGraph
 
     createNodes (adjacency : List (String × List String)) (acc : List String) : String :=
       match adjacency with
-        | [] => "\n".intercalate acc
-        | (node, []) :: tail => s!"  \"{node}\"" :: acc |> createNodes tail
-        | (node, successors) :: tail => createNodes tail (successors.eraseDups.mapTR (createEdge node) ++ acc)
+      | [] => "\n".intercalate acc
+      | (node, []) :: tail => s!"  \"{node}\"" :: acc |> createNodes tail
+      | (node, successors) :: tail => createNodes tail (successors.eraseDups.mapTR (createEdge node) ++ acc)
 
     @[always_inline]
     createEdge (nodeA : String) (nodeB : String) : String :=
@@ -102,8 +102,8 @@ namespace DiGraph
       search (graph : DiGraph) (node : String) (visited : HashSet String) (degree : Nat) : HashSet String :=
         -- Without structural recursion the the graphs degree this function would be partial.
         match degree with
-         | 0 => visited.insert node
-         | i + 1 => graph.adjacency.getD node [] |>.foldrTR (aux i) (visited.insert node)
+        | 0 => visited.insert node
+        | i + 1 => graph.adjacency.getD node [] |>.foldrTR (aux i) (visited.insert node)
 
       @[always_inline]
       aux (degree : Nat) (node : String) (visited : HashSet String) : HashSet String :=
@@ -122,10 +122,10 @@ namespace DiGraph
       none
     else
       match graph.findPredecessors node, graph.findSuccessors node with
-        | none, none => some {node}
-        | some ancestors, none => ancestors.insert node
-        | none, some descendents => descendents.insert node
-        | some ancestors, some descendents => HashSet.insertMany {node} ancestors |>.insertMany descendents
+      | none, none => some {node}
+      | some ancestors, none => ancestors.insert node
+      | none, some descendents => descendents.insert node
+      | some ancestors, some descendents => HashSet.insertMany {node} ancestors |>.insertMany descendents
 
 
   def getSubGraph (graph : DiGraph) (nodesToKeep : HashSet String) : DiGraph :=
@@ -161,15 +161,15 @@ where
 
   addTargets (rules : List String) (acc : DiGraph) : DiGraph :=
     match rules with
-      | [] => acc
-      | head :: tail =>
-        if head.startsWith "#" then
-          addTargets tail acc
-        else
-          match head.splitOn "\n" |>.getD 0 "" |>.splitOn ":" with
-            | ".PHONY" :: _ => addTargets tail acc
-            | target :: prerequisites :: [] => parsePrerequisites prerequisites |> acc.addRule target |> addTargets tail
-            | _ => addTargets tail acc
+    | [] => acc
+    | head :: tail =>
+      if head.startsWith "#" then
+        addTargets tail acc
+      else
+        match head.splitOn "\n" |>.getD 0 "" |>.splitOn ":" with
+        | ".PHONY" :: _ => addTargets tail acc
+        | target :: prerequisites :: [] => parsePrerequisites prerequisites |> acc.addRule target |> addTargets tail
+        | _ => addTargets tail acc
 
   @[always_inline]
   parsePrerequisites (deps : String) : Option (List String) := 
