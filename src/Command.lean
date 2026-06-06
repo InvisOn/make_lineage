@@ -12,15 +12,6 @@ def runCommands (p : Parsed) : IO UInt32 := do
 
   let mut graph := parseMakeDatabase input
 
-
-  if let some node := p.flag? "keep-lineage" then
-    match graph.getLineageNode node.value with
-      | none => 
-        IO.eprintln s!"Cannot keep only the lineage {node.value} because it was not found in the Makefile DAG"
-        return 1
-      | some lineage => 
-        graph := graph.getSubGraph lineage
-
   if let some node := p.flag? "prune-lineage" then
     match graph.getLineageNode node.value with
       | none => 
@@ -29,10 +20,18 @@ def runCommands (p : Parsed) : IO UInt32 := do
       | some lineage => 
         graph := graph.pruneNodes lineage
 
+  if let some node := p.flag? "keep-lineage" then
+    match graph.getLineageNode node.value with
+      | none => 
+        IO.eprintln s!"Cannot keep only the lineage {node.value} because it was not found in the Makefile DAG. Was this node pruned?"
+        return 1
+      | some lineage => 
+        graph := graph.getSubGraph lineage
+
   if let some node := p.flag? "highlight-lineage" then
     match graph.getLineageNode node.value with
       | none => 
-        IO.eprintln s!"Cannot highlight {node.value} because it was not found in the Makefile DAG"
+        IO.eprintln s!"Cannot highlight {node.value} because it was not found in the Makefile DAG. Was this node pruned?"
         return 1
       | some lineage => 
         graph.toDot lineage |> IO.println 
@@ -48,10 +47,8 @@ def setupCommands : Cmd := `[Cli|
   "Parse Makefile database to dot"
 
   FLAGS:
-    p, "prune-lineage"     : String; "Prune DAG of the given node's lineage.
-Has precedence over --keep-lineage and --highlight-lineage"
-
-    k, "keep-lineage"      : String;  "Keep only the given node's lineage."
-    l, "highlight-lineage" : String;  "Highlight the given node's lineage."
+    p, "prune-lineage"     : String; "Prune DAG of the given node's lineage. Pruning is done first."
+    k, "keep-lineage"      : String; "Keep only the given node's lineage."
+    l, "highlight-lineage" : String; "Highlight the given node's lineage."
 ]
 
