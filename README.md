@@ -4,7 +4,7 @@ A simple Makefile to dot conversion tool. It also supports pruning and highlight
 
 Build with `lake build -Krelease`.
 
-## Highlighting
+## Highlighting the lineage of `common.h`
 
 ```sh
 LANG=C make -n -p -f res/Makefile | .lake/build/bin/ml --highlight-lineage common.h | dot -Tpng -o res/prune-common.png
