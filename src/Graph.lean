@@ -123,6 +123,10 @@ namespace DiGraph
     graph.findPredecessors node |>.insertMany (graph.findSuccessors node) |>.insert node
 
 
+  def getLineageNodes (graph : DiGraph) (nodes : HashSet String) : HashSet String :=
+    nodes.fold (fun acc n => graph.getLineageNode n |> acc.insertMany) {}
+
+
   def getSubGraph (graph : DiGraph) (nodesToKeep : HashSet String) : DiGraph :=
     { adjacency := graph.adjacency.filterMap predicateMap }
   where
