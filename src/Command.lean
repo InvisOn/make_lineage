@@ -44,7 +44,7 @@ def runCommands (p : Parsed) : IO UInt32 := do
 
 
 def setupCommands : Cmd := `[Cli|
-  make_lineage VIA runCommands; ["0.0.1"]
+  make_lineage VIA runCommands; ["0.1.0"]
   "Parse Makefile database to dot"
 
   FLAGS:
