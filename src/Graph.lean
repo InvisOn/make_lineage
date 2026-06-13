@@ -120,7 +120,7 @@ namespace DiGraph
 
 
   def getLineageNode (graph : DiGraph) (node : String) : HashSet String :=
-    graph.findSuccessors node |>.insertMany (graph.findPredecessors node) |>.insert node
+    graph.findPredecessors node |>.insertMany (graph.findSuccessors node) |>.insert node
 
 
   def getSubGraph (graph : DiGraph) (nodesToKeep : HashSet String) : DiGraph :=

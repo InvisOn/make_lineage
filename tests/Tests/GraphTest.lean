@@ -51,7 +51,7 @@ def graph := ({ adjacency := HashMap.ofList [("a", ["b", "c"]), ("b", ["c"]), ("
 #eval graph.findSuccessors "b"
 
 
-/-- info: Std.HashSet.ofList ["d", "a", "c", "b"] -/
+/-- info: Std.HashSet.ofList ["d", "c", "a", "b"] -/
 #guard_msgs in
 #eval graph.getLineageNode "b"
 
