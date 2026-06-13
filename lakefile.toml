@@ -1,6 +1,6 @@
-name = "make_visual"
-version = "0.1.0"
-defaultTargets = ["make_visual"]
+name = "make_lineage"
+version = "0.2.0"
+defaultTargets = ["ml"]
 testDriver = "tests"
 
 [[lean_lib]]
@@ -17,7 +17,7 @@ git = "https://github.com/leanprover/lean4-cli"
 rev = "main"
 
 [[lean_exe]]
-name = "make_visual"
+name = "ml"
 srcDir = "src"
 root = "Main"
 
