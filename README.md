@@ -20,7 +20,7 @@ LANG=C make -n -p -f res/Makefile | .lake/build/bin/ml --keep-lineage common.h |
 
 ![keep](./res/keep-common.png)
 
-## Pruning the lineage of `bench`
+## Pruning the lineage of `common.h`
 
 ```sh
 LANG=C make -n -p -f res/Makefile | .lake/build/bin/ml --prune-lineage common.h | dot -Tpng -o res/prune-common.png
