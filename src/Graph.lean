@@ -86,7 +86,7 @@ namespace DiGraph
 
     @[always_inline]
     createEdge (nodeA : String) (nodeB : String) : String :=
-      if lineageHighlightNodes.contains nodeA || lineageHighlightNodes.contains nodeB then
+      if lineageHighlightNodes.contains nodeA && lineageHighlightNodes.contains nodeB then
         s!"  \"{nodeA}\" -> \"{nodeB}\" [color=\"#5B8DB8\", penwidth=1]"
       else
         s!"  \"{nodeA}\" -> \"{nodeB}\""
