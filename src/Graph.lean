@@ -57,24 +57,24 @@ namespace DiGraph
       s!"{adjacent.fst} -> [{", ".intercalate adjacent.snd}]"
 
 
-  def toDot (graph : DiGraph) (nodesToFill : HashSet String := {}) : String :=
+  def toDot (graph : DiGraph) (lineageHighlightNodes : HashSet String := {}) : String :=
     s!"digraph G \{
   graph [rankdir=RL]
   node [shape=box, style=solid, margin=\"0.3,0.1\"]
-  edge [color=\"#00000088\", dir=back, penwidth=1.2, minlen=1]
+  edge [color=\"#00000088\", dir=back, penwidth=1, minlen=1]
 
 {filledNodes}{dotNodes}
 }"
   where
     filledNodes := 
-      if nodesToFill.isEmpty then
+      if lineageHighlightNodes.isEmpty then
         ""
       else
-        nodesToFill.toList.mapTR aux |> "\n".intercalate |> (· ++ "\n\n")
+        lineageHighlightNodes.toList.mapTR aux |> "\n".intercalate |> (· ++ "\n\n")
 
     @[always_inline]
     aux (node : String) : String :=
-      s!"  \"{node}\" [style = \"solid,filled\"]"
+      s!"  \"{node}\" [style = \"solid,filled\", fillcolor=\"#A8C4E0\"]"
 
     dotNodes := createNodes graph.adjacency.toList []
 
@@ -86,7 +86,10 @@ namespace DiGraph
 
     @[always_inline]
     createEdge (nodeA : String) (nodeB : String) : String :=
-       s!"  \"{nodeA}\" -> \"{nodeB}\""
+      if lineageHighlightNodes.contains nodeA || lineageHighlightNodes.contains nodeB then
+        s!"  \"{nodeA}\" -> \"{nodeB}\" [color=\"#5B8DB8\", penwidth=1]"
+      else
+        s!"  \"{nodeA}\" -> \"{nodeB}\""
 
   
   def degree (graph : DiGraph) : Nat :=
@@ -95,6 +98,10 @@ namespace DiGraph
 
   def isEmpty (graph : DiGraph) : Bool :=
     graph.degree == 0
+
+
+  def contains (graph : DiGraph) (nodes : HashSet String) : Bool :=
+    nodes.all (graph.adjacency.contains ·)
 
 
   def depthFirstSearch (graph : DiGraph) (source : String) : HashSet String :=
