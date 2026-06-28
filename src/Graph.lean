@@ -59,6 +59,7 @@ namespace DiGraph
 
   def toDot (graph : DiGraph) (lineageHighlightNodes : HashSet String := {}) : String :=
     s!"digraph G \{
+  bgcolor=\"transparent\"
   graph [rankdir=RL]
   node [shape=box, style=solid, margin=\"0.3,0.1\"]
   edge [color=\"#00000088\", dir=back, penwidth=1, minlen=1]
